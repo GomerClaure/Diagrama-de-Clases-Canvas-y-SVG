@@ -15,48 +15,40 @@ function dibujarRect() {
     var clase = un_objeto.name;
     var variables = un_objeto.variables;
     var metodos = un_objeto.metodos;
-    let achoMAx = tamMaxCadena(clase.concat(variables, metodos)) * 16;
-
-    var alto_clase = 30;
-    var posTextoY = un_objeto.y + 28;
-    ctx.beginPath();
-    ctx.fillStyle = 'red';
-    ctx.font = '16pt Verdana';
-    ctx.fillText(clase[0], un_objeto.x, posTextoY);
-    ctx.beginPath();
-    ctx.rect(un_objeto.x, un_objeto.y, achoMAx, alto_clase);
-    ctx.strokeStyle = "black";
-    ctx.stroke();
-
-    for (let elemento of un_objeto.variables) {
-      alto_clase += 30;
-      posTextoY += 28;
-      ctx.beginPath();
-      ctx.fillStyle = 'red';
-      ctx.font = '16pt Verdana';
-      ctx.fillText(elemento, un_objeto.x, posTextoY);
-    }
-    ctx.beginPath();
-    ctx.rect(un_objeto.x, un_objeto.y, achoMAx, alto_clase);
-    ctx.strokeStyle = "black";
-    ctx.stroke();
-
-    for (let elemento of un_objeto.metodos) {
-      alto_clase += 30
-      posTextoY += 28;
-      ctx.beginPath();
-      ctx.fillStyle = 'red';
-      ctx.font = '16pt Verdana';
-      ctx.fillText(elemento, un_objeto.x, posTextoY);
-    }
-    ctx.beginPath();
-    ctx.rect(un_objeto.x, un_objeto.y, achoMAx, alto_clase);
-    ctx.strokeStyle = "black";
-    ctx.stroke();
+    let anchoMax = tamMaxCadena(clase.concat(variables, metodos)) * 12;
+    var color = un_objeto.color
+    var alto_clase = 1;
+    var posTextoY = un_objeto.y;
+    var result = dibujarCaja(color, clase,un_objeto.x,un_objeto.y,posTextoY,anchoMax, alto_clase);
+    alto_clase = result.altoMax;
+    posTextoY = result.posTextY;
+    var result = dibujarCaja(color, variables,un_objeto.x,un_objeto.y,posTextoY,anchoMax, alto_clase);
+    alto_clase = result.altoMax;
+    posTextoY = result.posTextY;
+    var result = dibujarCaja(color, metodos,un_objeto.x,un_objeto.y,posTextoY,anchoMax, alto_clase);
+    un_objeto.width = anchoMax;
+    un_objeto.height = alto_clase;
   }
 }
 
-
+function dibujarCaja(color, listaTextos, puntoX, puntoY, posTextY, anchoMax, altoMax){
+  for (let elemento of listaTextos) {
+    altoMax += 16;
+    posTextY += 16;
+    ctx.beginPath();
+    ctx.fillStyle = color;
+    ctx.font = '10pt Verdana';
+    ctx.fillText(elemento, puntoX, posTextY);
+  }
+  ctx.beginPath();
+  ctx.rect(puntoX, puntoY, anchoMax, altoMax);
+  ctx.strokeStyle = color;
+  ctx.stroke();
+  return {
+    altoMax: altoMax,
+    posTextY: posTextY,
+  };
+}
 function addClass() {
   console.log(objetoActual);
   var classInput = document.getElementById("input-class").value;
@@ -64,9 +56,9 @@ function addClass() {
     objetos.push({
       x: 10, y: 10,
       width: 40, height: 20,
-      color: 'black',
+      color: "black",
       name: [classInput],
-      variables: ["var1;", "var2;"],
+      variables: ["var1;"],
       metodos: ["algo();"]
     });
   } else {
@@ -75,6 +67,30 @@ function addClass() {
 
   }
   dibujarRect();
+
+}
+
+
+function addVariable(){
+  var varInput = document.getElementById("input-var").value;
+  if (objetoActual != null) {
+    limpiarCanvas();
+    var listaDeVar = objetoActual.variables;
+    listaDeVar.push(varInput);
+    objetoActual.variables = listaDeVar;
+    dibujarRect();
+  } 
+
+}
+
+function addMethod(){
+  var methodInput = document.getElementById("input-metodo").value;
+  if (objetoActual != null) {
+    limpiarCanvas();
+    var listaDeMetodos = objetoActual.metodos;
+    listaDeMetodos.push(methodInput);
+    dibujarRect();
+  } 
 
 }
 
@@ -90,8 +106,8 @@ canvas.addEventListener("mousedown", function (evt) {
 
       console.log("true");
       arrastrar = true;
-      delta.x = evt.clientX - objetos[i].x;
-      delta.y = evt.clientY - objetos[i].y;
+      delta.x = evt.offsetX - objetos[i].x;
+      delta.y = evt.offsetY - objetos[i].y;
       objetoActual = objetos[i];
       break
 
@@ -107,8 +123,8 @@ canvas.addEventListener("mousemove", function (evt) {
   if (arrastrar == true && objetoActual != null) {
 
     limpiarCanvas();
-    objetoActual.x = evt.clientX - delta.x;
-    objetoActual.y = evt.clientY - delta.y;
+    objetoActual.x = evt.offsetX - delta.x;
+    objetoActual.y = evt.offsetY - delta.y;
     dibujarRect();
   }
 }, false);
