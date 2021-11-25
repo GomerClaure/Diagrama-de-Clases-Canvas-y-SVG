@@ -146,6 +146,7 @@ function tamMaxCadena(listaClases) {
   return tamMax
 }
 
+
 canvas.addEventListener('click',e=>{
     if(linea){
             console.log(objetosPresionados)
@@ -166,14 +167,12 @@ canvas.addEventListener('click',e=>{
             if(objetosPresionados.length == 2){
               var obj1=objetosPresionados[0];
               var obj2=objetosPresionados[1];
+              console.log(obj1.clase);
+              console.log(obj2.clase);
               lista_lineas.push(obj1);
               lista_lineas.push(obj2);      
-              ctx.beginPath();
-              ctx.moveTo(obj1.x+obj1.width,obj1.y);
-              ctx.lineTo(obj2.x, obj2.y);
-              ctx.strokeStyle='black';
-              ctx.stroke();
-              ctx.closePath();
+              lista_lineas.push(".");
+              dibujarlineas(obj1,obj2);
               linea=false;
               objetosPresionados=[];
             }
@@ -195,3 +194,20 @@ canvas.addEventListener('click',e=>{
           }
     }
   });
+
+function lineasss(){
+  for(var i=0;i<lista_lineas.length;i++){
+      dibujarlineas(lista_lineas[i],lista_lineas[i+1])
+      i=i+2;
+  }
+}
+function dibujarlineas(obj1,obj2){
+  ctx.beginPath();
+  
+  ctx.moveTo(obj1.x,obj1.y);
+  ctx.lineTo(obj2.x, obj2.y);
+  ctx.strokeStyle='black';
+  ctx.stroke();
+  ctx.closePath();
+}
+  
