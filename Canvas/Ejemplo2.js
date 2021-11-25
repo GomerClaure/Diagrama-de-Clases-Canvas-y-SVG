@@ -128,6 +128,7 @@ canvas.addEventListener("mousemove", function (evt) {
 
 canvas.addEventListener("mouseup", function (evt) {
   arrastrar = false;
+  lineasss();
 }, false);
 
 
