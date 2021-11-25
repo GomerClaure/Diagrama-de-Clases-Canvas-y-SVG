@@ -1,11 +1,26 @@
+var cajaActual;
 var objetos = [];
+var objetoPresionado;
+var objetosPresionados = [];
+var lista_lineas=[];
+var pos = 0;
 var objetoActual = null;
 var arrastrar = false;
 var delta = new Object();
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
+let linea=false;
+let lineaherencia=false;
+var posX=-1;
+var posY=-1;
 
 
+function linea_button(){
+    linea=true;
+}
+function lineaHerencia_button(){
+  lineaherencia=true;
+}
 function dibujarRect() {
   for (var i = 0; i < objetos.length; i++) {
     var un_objeto = objetos[i];
@@ -17,14 +32,12 @@ function dibujarRect() {
     for (let listaValores of [un_objeto.clase, un_objeto.variables,
     un_objeto.metodos]) {
       for (let texto of listaValores) {
-        if (texto != ""){
-          altoMax += 16;
-          posTextY += 16;
-          ctx.beginPath();
-          ctx.fillStyle = color;
-          ctx.font = '10pt Verdana';
-          ctx.fillText(texto, un_objeto.x, posTextY);
-        }
+        altoMax += 16;
+        posTextY += 16;
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        ctx.font = '10pt Verdana';
+        ctx.fillText(texto, un_objeto.x, posTextY);
       }
       ctx.beginPath();
       ctx.strokeStyle = "color";
@@ -38,7 +51,7 @@ function dibujarRect() {
 
 
 function addClass() {
-  console.log(objetoActual);
+  
   var classInput = document.getElementById("input-class").value;
   if (objetoActual === null) {
     objetos.push({
@@ -46,12 +59,14 @@ function addClass() {
       width: 40, height: 20,
       color: "black",
       clase: [classInput],
-      variables: [""],
-      metodos: [""]
+      variables: ["var1;"],
+      metodos: ["algo();"]
     });
   } else {
+    console.log("entra al else")
     limpiarCanvas();
-    objetoActual.name = [classInput];
+    objetoActual.clase = [classInput];
+    console.log(objetoActual);
 
   }
   dibujarRect();
@@ -130,3 +145,53 @@ function tamMaxCadena(listaClases) {
   }
   return tamMax
 }
+
+canvas.addEventListener('click',e=>{
+    if(linea){
+            console.log(objetosPresionados)
+            if(objetoActual != null){
+              if(objetosPresionados.length == 0){
+                console.log(objetosPresionados)
+                console.log(objetoActual)
+                objetosPresionados.push(objetoActual);
+              }else{
+                console.log("entra al else")
+                objetoPresionado = objetosPresionados[0]
+                if(objetoPresionado.x != objetoActual.x && objetoPresionado.y !=objetoActual.y){
+                  console.log(objetosPresionados)
+                  objetosPresionados.push(objetoActual);   
+                }
+              }
+            }            
+            if(objetosPresionados.length == 2){
+              var obj1=objetosPresionados[0];
+              var obj2=objetosPresionados[1];
+              lista_lineas.push(obj1);
+              lista_lineas.push(obj2);      
+              ctx.beginPath();
+              ctx.moveTo(obj1.x+obj1.width,obj1.y);
+              ctx.lineTo(obj2.x, obj2.y);
+              ctx.strokeStyle='black';
+              ctx.stroke();
+              ctx.closePath();
+              linea=false;
+              objetosPresionados=[];
+            }
+    }
+    else if(lineaherencia){
+          if(posX>=0 && posY>=0){
+            ctx.beginPath();
+            ctx.moveTo(posX,posY);
+            ctx.lineTo(e.offsetX,e.offsetY);
+            ctx.strokeStyle='black';
+            ctx.stroke();
+            ctx.closePath();
+            lineaherencia=false;
+            posX=-1;
+            posY=-1;
+          }else{
+            posX=e.offsetX;
+            posY=e.offsetY;
+          }
+    }
+  });
